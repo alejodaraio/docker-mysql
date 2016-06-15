@@ -1,0 +1,59 @@
+#!/usr/bin/python
+
+from optparse import OptionParser
+import os
+import sys
+import time
+
+# ------------------------------------------------------------------------------------------------------#
+# ------------------------------------------ Set Arguments ---------------------------------------------#
+# ------------------------------------------------------------------------------------------------------#
+
+parser = OptionParser()
+parser.add_option("-d", "--database-name", type="string", dest="dbname", default="tndb", help="Set the database name")
+parser.add_option("-q", "--sql-file", type="string", dest="sql_file", default="", help="Sql file to execute once the instance is running")
+parser.add_option("-n", "--instance-name", type="string", dest="instance_name", default="tn_db", help="(Optional) The name of the instance")
+(arguments, args) = parser.parse_args()
+
+# ------------------------------------------------------------------------------------------------------#
+# ----------------------------------------- ARGS VALIDATIONS -------------------------------------------#
+# ------------------------------------------------------------------------------------------------------#
+
+if len(sys.argv) == 1:
+    parser.print_help()
+    exit(1)
+
+# ------------------------------------------------------------------------------------------------------#
+# ------------------------------------------- MAIN -----------------------------------------------------#
+# ------------------------------------------------------------------------------------------------------#
+
+INSTANCE_NAME=arguments.instance_name
+INSTANCE_PASSWORD="root"
+DB_NAME=arguments.dbname
+DB_DUMP=arguments.sql_file
+
+#Definitions
+def main():
+    os.system('docker stop ' + INSTANCE_NAME + ' && docker rm ' + INSTANCE_NAME)
+    createMysqlServer()
+    createDB()
+    importDump()
+    return
+
+def createMysqlServer():
+    os.system('./lib/mysql/dmysql-server ' + INSTANCE_NAME + ' ' + INSTANCE_PASSWORD)
+    #we need wait startup the mysql :/
+    time.sleep(60)
+    return
+
+def createDB():
+    os.system('./lib/mysql/dmysql-create-database ' + DB_NAME + ' ' + INSTANCE_NAME + ' ' + INSTANCE_PASSWORD)
+    return
+
+def importDump():
+    os.system('./lib/mysql/dmysql-import-database ' + INSTANCE_NAME + ' ' + DB_DUMP + ' ' + INSTANCE_PASSWORD + ' --database=' + DB_NAME)
+
+# ----------------------------------------------------------#
+# --------------------------- INIT -------------------------#
+# ----------------------------------------------------------#
+main()
