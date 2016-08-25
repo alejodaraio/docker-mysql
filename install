@@ -12,7 +12,7 @@ import time
 parser = OptionParser()
 parser.add_option("-d", "--database-name", type="string", dest="dbname", default="tndb", help="Set the database name")
 parser.add_option("-q", "--sql-file", type="string", dest="sql_file", default="", help="Sql file to execute once the instance is running")
-parser.add_option("-n", "--instance-name", type="string", dest="instance_name", default="tn_db", help="(Optional) The name of the instance")
+parser.add_option("-n", "--instance-name", type="string", dest="instance_name", default="tndb", help="(Optional) The name of the instance")
 (arguments, args) = parser.parse_args()
 
 # ------------------------------------------------------------------------------------------------------#
@@ -34,6 +34,7 @@ DB_DUMP=arguments.sql_file
 
 #Definitions
 def main():
+    print 'Stop and remove ' + INSTANCE_NAME
     os.system('docker stop ' + INSTANCE_NAME + ' && docker rm ' + INSTANCE_NAME)
     createMysqlServer()
     createDB()
@@ -41,13 +42,19 @@ def main():
     return
 
 def createMysqlServer():
+    print 'Create Mysql Container'
     os.system('./lib/mysql/dmysql-server ' + INSTANCE_NAME + ' ' + INSTANCE_PASSWORD)
+
     #we need wait startup the mysql :/
+    print 'Starting UP the Mysql Server'
     time.sleep(60)
+
+    print 'Mysql Server is UP'
+
     return
 
 def createDB():
-    os.system('./lib/mysql/dmysql-create-database ' + DB_NAME + ' ' + INSTANCE_NAME + ' ' + INSTANCE_PASSWORD)
+    os.system('./lib/mysql/dmysql-create-database ' + INSTANCE_NAME + ' ' + DB_NAME + ' ' + INSTANCE_PASSWORD)
     return
 
 def importDump():

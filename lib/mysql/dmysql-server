@@ -4,13 +4,6 @@ import sys
 from subprocess import call
 import argparse
 
-def createVolume(containerVolumeName):
-	''' Create a data only container
-	'''
-	print 'Creating the container using the volumes-from strategy. Using container {container} as the container name'.format(container=containerVolumeName)
-	call("docker run -v /var/lib/mysql --name "+ containerVolumeName+" busybox true", shell=True)
-	return
-
 def runContainer(containerName, rootPassword):
     call('docker run --name ' + containerName + ' -p 3306:3306 -e MYSQL_ROOT_PASSWORD="' + rootPassword + '" -d mysql', shell=True)
     return
@@ -23,7 +16,6 @@ def main():
 
     parser.add_argument("containerName", help="The name of the mysql container to create")
     parser.add_argument("rootPassword", help="The root password to define when creating the container")
-    parser.add_argument("--with-volume", help="Creates a data-only container", action='store_true')
 
     args = parser.parse_args()
 

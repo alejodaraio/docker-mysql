@@ -7,6 +7,7 @@ import argparse
 def runContainer(containerName, databaseName, databasePassword):
 	''' Runs the command to create the database given using the container given
 	'''
+	print 'creating datbase'
 	call("docker run -it --link=" + containerName + ":mysql --rm mysql sh -c 'exec mysqladmin -h$MYSQL_PORT_3306_TCP_ADDR -P$MYSQL_PORT_3306_TCP_PORT -uroot -p" + databasePassword + " create "+ databaseName +" '", shell=True)
 	return
 
